@@ -24,9 +24,7 @@ function generateReport() {
             alert(data.message);
             return;
         }
-
         renderReport(data.data);
-
     })
     .catch(err => {
         showLoading(false);
@@ -125,6 +123,7 @@ function showLoading(show) {
     document.getElementById('loadingOverlay').style.display =
         show ? 'flex' : 'none';
 }
+
 function loadLocations() {
 
     fetch('/get_locations')
@@ -142,11 +141,8 @@ function loadLocations() {
             `<option value="${item}">
                 ${item}
             </option>`;
-
         });
-
     });
-
 }
 
 
@@ -170,13 +166,9 @@ function loadMonths() {
             `<option value="${item.value}">
                 ${item.label}
             </option>`;
-
         });
-
         loadOrganizations();
-
     });
-
 }
 
 function downloadExcel() {
@@ -199,7 +191,6 @@ function downloadExcel() {
         `/download_excel?location=${encodeURIComponent(location)}`
         + `&month_year=${encodeURIComponent(month_year)}`
         + `&organization=${encodeURIComponent(organization)}`;
-
     window.location.href = url;
 }
 
@@ -216,28 +207,18 @@ function loadOrganizations() {
     )
     .then(r=>r.json())
     .then(res=>{
-
         let ddl =
             document.getElementById('selOrganization');
-
         ddl.innerHTML='';
-
         res.data.forEach(item=>{
-
             ddl.innerHTML +=
             `<option value="${item}">
                 ${item}
             </option>`;
-
         });
-
     });
-
 }
 
-
 window.onload = function () {
-
     loadLocations();
-
 };

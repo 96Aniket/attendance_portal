@@ -10,13 +10,9 @@
 </head>
 <body class="bg-light">
 
-<!-- ============================================================
-     HEADER
-     ============================================================ -->
 <header class="header-dashboard"
     style="display:flex;justify-content:space-between;align-items:center;width:100%;position:relative;">
 
-    <!-- Left: hamburger + logo + title -->
     <div class="hamburger-dashboard" id="hamburger"
         style="display:flex;align-items:center;gap:10px;cursor:pointer;">
         ☰
@@ -31,13 +27,8 @@
     </div>
 </header>
 
-
-<!-- ============================================================
-     PAGE CONTENT
-     ============================================================ -->
 <div class="container-fluid px-3 pt-3">
 
-    <!-- ---- FORM CARD ---- -->
     <div id="formSection" class="row justify-content-center">
         <div class="col-12 col-sm-10 col-md-7 col-lg-5">
             <div class="card shadow-sm" style="border-radius:12px;overflow:hidden;">
@@ -81,10 +72,8 @@
         </div>
     </div>
 
-    <!-- ---- REPORT SECTION ---- -->
     <div id="reportSection" style="display:none;">
 
-        <!-- Toolbar -->
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
 
             <button class="btn btn-outline-secondary btn-sm fw-semibold"
@@ -96,12 +85,12 @@
                   style="font-size:1rem;"></span>
 
             <div class="d-flex gap-2">
-                <!-- Download Excel button -->
+
                 <button class="btn btn-success btn-sm fw-semibold"
                         onclick="downloadExcel()" id="btnDownloadExcel">
                     ⬇ Download Excel
                 </button>
-                <!-- Print button -->
+
                 <button class="btn btn-secondary btn-sm fw-semibold"
                         onclick="printReport()">
                     🖨 Print
@@ -115,7 +104,6 @@
 
 </div>
 
-<!-- LOADING SPINNER -->
 <div id="loadingOverlay" class="loading-overlay" style="display:none;">
     <div class="spinner-border text-primary" role="status"
          style="width:3rem;height:3rem;"></div>

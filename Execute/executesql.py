@@ -1,9 +1,9 @@
-import pyodbc
+import pyodbc # type: ignore
 
 def get_connection():
     try:
         conn = pyodbc.connect(
-            
+           
         )
         print("Connection Successful")
         return conn

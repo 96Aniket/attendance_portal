@@ -2,16 +2,11 @@ from flask import request, jsonify, session, render_template, redirect, send_fil
 from Execute import queries
 from datetime import date
 import io
-import openpyxl
-from openpyxl.styles import (
+import openpyxl # type: ignore
+from openpyxl.styles import ( # type: ignore
     PatternFill, Font, Alignment, Border, Side
 )
-from openpyxl.utils import get_column_letter
-
-
-# =====================================================
-# COMMON RESPONSE HELPERS
-# =====================================================
+from openpyxl.utils import get_column_letter # type: ignore
 
 def success_response(message="", data=None, status=200):
     res = {"success": True, "message": message}
@@ -23,10 +18,6 @@ def success_response(message="", data=None, status=200):
 def error_response(message="Something went wrong", status=400):
     return jsonify({"success": False, "message": message}), status
 
-
-# =====================================================
-# DROPDOWN APIs
-# =====================================================
 
 def get_locations_fn():
     try:
@@ -54,10 +45,6 @@ def get_organizations_by_filter_fn():
     except Exception as e:
         return error_response(str(e), 500)
 
-
-# =====================================================
-# SHARED: BUILD REPORT DATA
-# =====================================================
 
 def _build_report(year, month, location, organization):
 
@@ -134,10 +121,6 @@ def _build_report(year, month, location, organization):
     }, None
 
 
-# =====================================================
-# GENERATE REPORT  (JSON for browser rendering)
-# =====================================================
-
 def generate_report_fn():
     try:
         data         = request.get_json()
@@ -158,10 +141,6 @@ def generate_report_fn():
     except Exception as e:
         return error_response(str(e), 500)
 
-
-# =====================================================
-# DOWNLOAD EXCEL  (same visual format as screenshot)
-# =====================================================
 
 def download_excel_fn():
     try:
@@ -197,30 +176,27 @@ def download_excel_fn():
         return error_response(str(e), 500)
 
 
-# =====================================================
-# EXCEL BUILDER  — matches screenshot layout exactly
-# =====================================================
-
 def _build_excel(report):
-    """
-    Build an openpyxl Workbook that exactly mirrors the Excel screenshot:
 
-    Row 1 (merged):  Location | <loc>   Date | <month>  Contractor Name | <org>
-    Row 2: blank
-    Row 3: Sr No | Name of Employees | Designation | 1 | 2 | ... | N | Mandays | OT | Remarks
-    Row 4+: data rows
-    """
-
-    # ---- colour / style constants ----
-    BLUE_FILL   = PatternFill("solid", fgColor="1565C0")   # header bg
+    BLUE_FILL   = PatternFill("solid", fgColor="1565C0")
     WHITE_FONT  = Font(name="Arial", bold=True, color="FFFFFF", size=9)
     BOLD_FONT   = Font(name="Arial", bold=True, size=9)
     NORMAL_FONT = Font(name="Arial", size=9)
     RED_FONT    = Font(name="Arial", bold=True, color="FF0000", size=9)
     GREY_FONT   = Font(name="Arial", color="888888", size=8, italic=True)
 
-    CENTER = Alignment(horizontal="center", vertical="center", wrap_text=True)
-    LEFT   = Alignment(horizontal="left",   vertical="center", wrap_text=True)
+    CENTER = Alignment(
+        horizontal="center",
+        vertical="center",
+        text_rotation=0,
+        wrap_text=False,
+        shrink_to_fit=True
+    )
+    LEFT = Alignment(
+        horizontal="left",
+        vertical="center",
+        wrap_text=False
+    )
 
     thin = Side(style="thin", color="CCCCCC")
     BORDER = Border(left=thin, right=thin, top=thin, bottom=thin)
@@ -228,6 +204,13 @@ def _build_excel(report):
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "Attendance Report"
+
+    for cell_ref in ["B1", "C1", "E1", "F1", "H1", "L1"]:
+        ws[cell_ref].alignment = Alignment(
+            horizontal="center",
+            vertical="center",
+            wrap_text=False
+        )
 
     days      = report["days"]
     day_names = report["day_names"]
@@ -244,18 +227,54 @@ def _build_excel(report):
     COL_REMARKS  = COL_LAST_DAY + 3
     TOTAL_COLS   = COL_REMARKS
 
-    ws.cell(1, 2, "Location").font   = BOLD_FONT
+    ws.cell(1, 2, "Location").font = BOLD_FONT
     ws.cell(1, 3, report["location"]).font = NORMAL_FONT
-    ws.cell(1, 4, "Date").font       = BOLD_FONT
-    ws.cell(1, 5, report["month_label"]).font = NORMAL_FONT
-    ws.cell(1, 6, "Contractor Name").font = BOLD_FONT
 
-    ws.merge_cells(
-        start_row=1, start_column=7,
-        end_row=1,   end_column=min(16, TOTAL_COLS)
+    ws.cell(1, 5, "Date").font = BOLD_FONT
+    ws.cell(1, 6, report["month_label"]).font = NORMAL_FONT
+
+    ws.merge_cells("H1:K1")
+
+    ws.column_dimensions["H"].width = 15
+    ws.column_dimensions["I"].width = 15
+    ws.column_dimensions["J"].width = 15
+    ws.column_dimensions["K"].width = 15
+
+    contractor_cell = ws["H1"]
+    contractor_cell.value = "Contractor Name"
+    contractor_cell.font = BOLD_FONT
+    contractor_cell.alignment = Alignment(
+        horizontal="center",
+        vertical="center"
     )
-    ws.cell(1, 7, report["organization"]).font = BOLD_FONT
-    ws.cell(1, 7).alignment = LEFT
+
+    contractor_cell.alignment = Alignment(
+        horizontal="center",
+        vertical="center",
+        wrap_text=False
+    )
+
+    ws.merge_cells("L1:T1")
+
+    org_cell = ws["L1"]
+    org_cell.value = report["organization"]
+
+    org_cell.font = Font(
+        name="Arial",
+        bold=True,
+        size=10
+    )
+
+    org_cell.alignment = Alignment(
+        horizontal="center",
+        vertical="center",
+        wrap_text=False
+    )
+
+    for col in range(12, 21):
+        ws.column_dimensions[
+            get_column_letter(col)
+        ].width = 12
 
     HDR_ROW = 3
 
@@ -356,7 +375,7 @@ def _build_excel(report):
     ws.column_dimensions[get_column_letter(COL_OT)].width       = 7
     ws.column_dimensions[get_column_letter(COL_REMARKS)].width  = 12
 
-    ws.row_dimensions[1].height = 16
+    ws.row_dimensions[1].height = 35
     ws.row_dimensions[HDR_ROW].height = 28
     ws.row_dimensions[DAY_ROW].height = 14
     for r in range(DAY_ROW + 1, DAY_ROW + 1 + len(rows)):
@@ -368,7 +387,7 @@ def _build_excel(report):
 
 
 def _fmt_decimal(val):
-    """Format a float attendance value for Excel display, e.g. 9.5 → '09.50'"""
+
     try:
         num = float(val)
         if num <= 0:

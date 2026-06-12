@@ -12,19 +12,9 @@ def get_user_context():
         "user_role":     user.get("role", "user")
     }
 
-
-# =====================================================
-# MAIN PAGE
-# =====================================================
-
 @routes_bp.route("/")
 def home():
     return render_template("index.html", **get_user_context())
-
-
-# =====================================================
-# ATTENDANCE REPORT APIs
-# =====================================================
 
 routes_bp.add_url_rule(
     "/generate_report",

@@ -1,10 +1,6 @@
 from Execute.executesql import get_connection
 from datetime import datetime, date
 
-# =====================================================
-# LOCATIONS
-# =====================================================
-
 def get_all_locations():
     try:
         conn = get_connection()
@@ -26,11 +22,6 @@ def get_all_locations():
     except Exception as e:
         print("get_all_locations error:", e)
         return []
-
-
-# =====================================================
-# MONTHS BY LOCATION
-# =====================================================
 
 def get_months_by_location(location):
     try:
@@ -55,11 +46,6 @@ def get_months_by_location(location):
     except Exception as e:
         print("get_months_by_location error:", e)
         return []
-
-
-# =====================================================
-# ORGANIZATIONS BY LOCATION + MONTH
-# =====================================================
 
 def get_orgs(location, month_year):
     try:
@@ -88,11 +74,6 @@ def get_orgs(location, month_year):
     except Exception as e:
         print("get_orgs error:", e)
         return []
-
-
-# =====================================================
-# ATTENDANCE DATA
-# =====================================================
 
 def fetch_attendance_data(year, month, location, organization):
     try:
@@ -151,4 +132,3 @@ def fetch_attendance_data(year, month, location, organization):
     except Exception as e:
         print("fetch_attendance_data error:", e)
         return False, str(e)
-    
